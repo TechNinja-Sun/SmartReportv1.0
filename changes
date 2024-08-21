@@ -1,0 +1,35 @@
+
+ """
+ <section id="queryDb">
+            <h2>查询知识库</h2>
+            <form id="queryForm">
+                <input type="text" name="db_name" placeholder="数据库名称" required>
+                <input type="hidden" name="question" value="对于知识库中内容，进行总结，并提出建议" required readonly>
+                <button type="submit">一键总结</button>
+            </form>
+            <div id="queryResults"></div>
+        </section>
+
+ document.getElementById("queryForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const response = await fetch("/query", {
+        method: "POST",
+        body: formData,
+    });
+
+    const resultsDiv = document.getElementById("queryResults");
+    resultsDiv.innerHTML = '';
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let done = false;
+
+    while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        resultsDiv.innerHTML += decoder.decode(value);
+    }
+});
+
+"""
